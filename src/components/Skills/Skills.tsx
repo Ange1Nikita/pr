@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import './Skills.css';
-import { useTheme } from '../../context/ThemeContext';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FaCode, FaServer, FaTools, FaCogs, FaGlobe } from 'react-icons/fa';
+import { FaCode, FaTools, FaDesktop, FaCogs } from 'react-icons/fa';
 import { 
   MdPeople, MdTimer, MdSearch, MdCheck, MdCalendarToday, 
   MdRefresh, MdHandshake, MdChat, MdAssessment, MdHome, MdSchool, MdBook 
@@ -34,7 +33,6 @@ interface SoftSkill {
 
 export const Skills: React.FC = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<'hard' | 'soft'>('hard');
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
   const skillsRef = useRef<HTMLDivElement>(null);
@@ -79,7 +77,7 @@ export const Skills: React.FC = () => {
     },
     {
       name: t('skills.categories.other'),
-      icon: <FaGlobe />,
+      icon: <FaDesktop />,
       skills: [
         { name: 'REST API, WebSockets, Long Polling', level: 8 },
         { name: 'BEM, Feature-Sliced Design', level: 9 },

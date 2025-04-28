@@ -25,11 +25,6 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
   const animationFrameRef = useRef<number | null>(null);
   
   // Параметры для отталкивания и перемещения с улучшенной плавностью
-  const WAVE_RADIUS = 150; // Радиус влияния курсора
-  const WAVE_STRENGTH = 80; // Увеличиваем силу отталкивания в 2 раза (было 40)
-  const WAVE_FALLOFF = 1.3; // Уменьшаем для усиления эффекта (было 1.5)
-  const MIN_DISTANCE = 12; // Немного уменьшаем для усиления близкого взаимодействия (было 15)
-  const FRICTION_FACTOR = 0.99; // Уменьшаем трение для более дальних полетов (было 0.985)
   const PUSHABLE_BORDER = 5; // Процент от края экрана для перехода
   const TRANSITION_SMOOTHNESS = 0.1; // Уменьшаем для более плавного движения (было 0.2)
   const RETURN_DELAY = 2000; // Задержка в мс перед возвратом цифр
@@ -37,9 +32,9 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
   const RETURN_FRICTION = 0.9995; // Практически отсутствующее трение для сверхдолгого движения
   const HOME_THRESHOLD = 0.15; // Уменьшаем порог для определения "дома" (было 0.2)
   const HOME_SMOOTHING = 0.02; // Сильно снижаем для максимальной плавности (было 0.05)
-  const IMPACT_BOOST = 2.5; // Коэффициент усиления импульса от движения мыши
   const RETURN_MIN_SPEED = 0.0001; // Минимальная скорость возврата для очень близких объектов
   const ULTRA_SLOW_FACTOR = 0.25; // Дополнительное замедление для сверхмедленного движения
+  const FRICTION_FACTOR = 0.99; // Уменьшаем трение для более дальних полетов (было 0.985)
   
   // Сохраняем текущие смещения и импульс всех цифр
   const digitPositions = useRef<{ x: number, y: number }[]>([]);
@@ -142,8 +137,6 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
         });
       }
       
-      let hasMovement = false;
-      
       // Постепенно снижаем скорость мыши для сглаживания движений
       mouseSpeed.current.x *= 0.95;
       mouseSpeed.current.y *= 0.95;
@@ -168,8 +161,6 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
           
           // Если цифра еще далеко от дома, продолжаем возвращать
           if (Math.abs(homeX) > HOME_THRESHOLD || Math.abs(homeY) > HOME_THRESHOLD) {
-            hasMovement = true;
-            
             // Используем расстояние для корректировки скорости
             const distanceFromHome = Math.sqrt(homeX * homeX + homeY * homeY);
             
@@ -225,8 +216,6 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
         }
         
         if (hasImpulse || hasDelta) {
-          hasMovement = true;
-          
           // Если есть импульс, обновляем целевую позицию
           if (hasImpulse) {
             digitTargets.current[index].x += digitMomentum.current[index].x * deltaTime;
@@ -333,15 +322,6 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
         // Сглаживаем скорость мыши (exponential moving average)
         mouseSpeed.current.x = mouseSpeed.current.x * 0.6 + deltaX * 0.4; // Меньше сглаживания (было 0.7/0.3)
         mouseSpeed.current.y = mouseSpeed.current.y * 0.6 + deltaY * 0.4; // Для более резкого отклика
-        
-        // Запускаем анимацию отталкивания только если мышь двигается достаточно быстро
-        if (Math.abs(mouseSpeed.current.x) > 1.0 || Math.abs(mouseSpeed.current.y) > 1.0) { // Снижаем порог (было 1.5)
-          updateDigitPositions(x, y, mouseSpeed.current.x, mouseSpeed.current.y);
-          // Обновляем время последнего взаимодействия
-          lastInteractionTime.current = performance.now();
-          // Сбрасываем флаг возврата домой
-          isReturningHome.current = false;
-        }
       }
       
       prevMousePos.current = { x, y };
@@ -355,92 +335,6 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
       document.removeEventListener('mousemove', handleGlobalMouseMove);
     };
   }, []);
-  
-  const resetDigitPositions = () => {
-    // Плавно сбрасываем все цифры на исходную позицию
-    digitRefs.current.forEach((digit, index) => {
-      if (digit) {
-        // Задаем целевую позицию как исходную
-        digitTargets.current[index] = { ...digitHomePositions.current[index] };
-        
-        // Сбрасываем импульс, но делаем это плавно
-        digitMomentum.current[index] = { 
-          x: digitMomentum.current[index].x * 0.2, 
-          y: digitMomentum.current[index].y * 0.2 
-        };
-        
-        // Применяем плавный переход
-        digit.style.transition = 'transform 1.5s cubic-bezier(0.25, 0.1, 0.25, 1)';
-      }
-    });
-    
-    // Устанавливаем флаг возврата домой
-    isReturningHome.current = true;
-  };
-
-  // Функция для обновления позиций всех цифр в зависимости от позиции мыши
-  const updateDigitPositions = (mouseX: number, mouseY: number, mouseSpeedX: number, mouseSpeedY: number) => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-
-    animationFrameRef.current = requestAnimationFrame(() => {
-      if (!containerRef.current) return;
-      
-      const containerRect = containerRef.current.getBoundingClientRect();
-      
-      digitRefs.current.forEach((digit, index) => {
-        if (!digit) return;
-        
-        const digitRect = digit.getBoundingClientRect();
-        const digitCenterX = digitRect.left - containerRect.left + digitRect.width / 2;
-        const digitCenterY = digitRect.top - containerRect.top + digitRect.height / 2;
-        
-        // Рассчитываем смещенный центр с учетом текущей позиции
-        const currentX = digitCenterX;
-        const currentY = digitCenterY;
-        
-        const dx = currentX - mouseX;
-        const dy = currentY - mouseY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < WAVE_RADIUS) {
-          // Используем плавную формулу отталкивания
-          const effectiveDistance = Math.max(distance, MIN_DISTANCE);
-          
-          // Регулируем силу в зависимости от скорости мыши и расстояния
-          const power = Math.pow((WAVE_RADIUS - distance) / WAVE_RADIUS, WAVE_FALLOFF);
-          
-          // Нормализуем направление и применяем силу
-          const directionX = dx / effectiveDistance;
-          const directionY = dy / effectiveDistance;
-          
-          // Рассчитываем силу отталкивания с учетом расстояния
-          const pushForceX = directionX * power * WAVE_STRENGTH;
-          const pushForceY = directionY * power * WAVE_STRENGTH;
-          
-          // Рассчитываем влияние движения мыши - сильнее при быстром движении
-          const speedFactor = Math.min(Math.sqrt(mouseSpeedX*mouseSpeedX + mouseSpeedY*mouseSpeedY) * 0.3, 3.0) * IMPACT_BOOST;
-          const mouseImpactX = -mouseSpeedX * power * speedFactor;
-          const mouseImpactY = -mouseSpeedY * power * speedFactor;
-          
-          // Рассчитываем итоговое воздействие
-          const moveX = pushForceX + mouseImpactX;
-          const moveY = pushForceY + mouseImpactY;
-          
-          // Обновляем импульс цифры (сильнее с близкого расстояния)
-          const closenessBoost = Math.pow(1 - distance / WAVE_RADIUS, 1.5) * 0.3 + 0.05;
-          digitMomentum.current[index].x += moveX * closenessBoost;
-          digitMomentum.current[index].y += moveY * closenessBoost;
-          
-          // Ограничиваем максимальный импульс для стабильности, но увеличиваем лимит
-          const maxMomentum = 25; // Увеличиваем (было 15)
-          digitMomentum.current[index].x = Math.max(Math.min(digitMomentum.current[index].x, maxMomentum), -maxMomentum);
-          digitMomentum.current[index].y = Math.max(Math.min(digitMomentum.current[index].y, maxMomentum), -maxMomentum);
-        }
-      });
-    });
-  };
   
   const handleMouseEnter = (index: number) => {
     setActiveIndex(index);
@@ -477,7 +371,7 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
 
   const positions = React.useMemo(() => {
     // Предрассчитываем позиции цифр так, чтобы они были только в пределах первого экрана
-    return binaryDigits.map((_, index) => {
+    return binaryDigits.map(() => {
       // Распределяем цифры равномерно по всей ширине и высоте экрана
       // но не слишком близко к краям
       const left = 5 + Math.random() * 90; // % от ширины экрана (5-95%)
@@ -531,7 +425,7 @@ interface AboutProps {
 }
 
 export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [displayText, setDisplayText] = useState('');
   const [showButton, setShowButton] = useState(false);
   const [startTyping, setStartTyping] = useState(false);

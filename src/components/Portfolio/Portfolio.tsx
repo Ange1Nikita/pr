@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import './Portfolio.css';
-import { useTheme } from '../../context/ThemeContext';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -17,7 +16,6 @@ interface ProjectCard {
 
 export const Portfolio: React.FC = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const sectionRef = useRef<HTMLElement>(null);
   const projectRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [visibleProjects, setVisibleProjects] = useState<Set<number>>(new Set());
