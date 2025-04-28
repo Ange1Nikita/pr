@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { HashRouter as Router } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Header } from './components/Header';
 import { About } from './components/About';

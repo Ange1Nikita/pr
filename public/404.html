@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Перенаправление</title>
+  <script>
+    // Логика перенаправления для GitHub Pages с SPA
+    (function() {
+      // GitHub Pages размещает страницу по пути `/pr/`
+      var segmentCount = 1;
+      
+      var l = window.location;
+      var repo = l.pathname.split('/').slice(0, 1 + segmentCount).join('/');
+      var path = l.pathname.slice(repo.length);
+      
+      // Если у нас есть какой-то путь после базового URL, сохраняем его в localStorage
+      if (path && path !== '/') {
+        // Удаляем начальный "/" если он есть
+        path = path.replace(/^\/+/, '');
+        // Сохраняем путь в localStorage
+        localStorage.setItem('spa_path', path);
+      }
+      
+      // Перенаправляем на корень приложения
+      l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + repo + '/' +
+        (localStorage.getItem('spa_query') || ''));
+    })();
+  </script>
+</head>
+<body>
+  <h1>Перенаправление...</h1>
+  <p>Если вы не были перенаправлены автоматически, <a href="/pr/">нажмите здесь</a>.</p>
+</body>
+</html> 
