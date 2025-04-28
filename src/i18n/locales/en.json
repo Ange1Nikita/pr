@@ -1,0 +1,143 @@
+{
+  "about": {
+    "baseText": "Nikita Kuznetsov — frontend developer,",
+    "firstPhrase": " ready to take the challenge!",
+    "secondPhrase": " Your project is too complex? Great, I like it!",
+    "buttonText": "View my projects"
+  },
+  "header": {
+    "about": "About me",
+    "skills": "Skills",
+    "portfolio": "Works",
+    "experience": "Experience",
+    "contacts": "Contacts",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "switchTheme": "Switch to {{theme}} theme",
+    "darkTheme": "dark",
+    "lightTheme": "light",
+    "language": "RU"
+  },
+  "skills": {
+    "title": "My Skills",
+    "hardSkills": "Hard Skills",
+    "softSkills": "Soft Skills",
+    "categories": {
+      "frontend": "Frontend",
+      "libraries": "Libraries & State Management",
+      "tools": "Development Tools",
+      "other": "Other Skills"
+    },
+    "softSkillsItems": {
+      "teamwork": {
+        "name": "Teamwork",
+        "description": "Experience working with designers, managers and developers in a team"
+      },
+      "deadlines": {
+        "name": "Meeting Deadlines",
+        "description": "Responsible attitude to deadlines and time constraints"
+      },
+      "attention": {
+        "name": "Attention to Detail",
+        "description": "Thorough approach to work and tracking details"
+      },
+      "codeQuality": {
+        "name": "Code Quality",
+        "description": "Focus on writing clean, maintainable code"
+      },
+      "timeManagement": {
+        "name": "Time Management",
+        "description": "Effective organization and prioritization of tasks"
+      },
+      "feedback": {
+        "name": "Open to Feedback",
+        "description": "Receptiveness to constructive criticism and improvements"
+      },
+      "conflictResolution": {
+        "name": "Conflict Resolution",
+        "description": "Ability to professionally resolve disagreements"
+      },
+      "communication": {
+        "name": "Clear Communication",
+        "description": "Clear expression of ideas and concepts"
+      },
+      "reporting": {
+        "name": "Detailed Reporting",
+        "description": "Thorough documentation and updates on work done"
+      },
+      "remoteWork": {
+        "name": "Remote Work",
+        "description": "Experience with productive remote collaboration"
+      },
+      "mentoring": {
+        "name": "Mentoring",
+        "description": "Experience teaching and mentoring other developers"
+      },
+      "learning": {
+        "name": "Continuous Learning",
+        "description": "Constant improvement of skills and knowledge"
+      }
+    }
+  },
+  "portfolio": {
+    "title": "My Projects",
+    "viewProject": "View Project",
+    "projects": {
+      "1": {
+        "title": "Trucking Desk",
+        "description": "Developed the Trucking Desk platform interface using React, Tailwind CSS, and Swiper.js, providing dynamic data loading, responsive design, slider integration, analytics integration, and creating a library of universal components."
+      },
+      "2": {
+        "title": "San Remo",
+        "description": "Developed and improved the San Remo website using React, responsive layout, and Swiper.js."
+      },
+      "3": {
+        "title": "Hongqi",
+        "description": "Migrated the website slider from jQuery to Swiper.js, ensuring cross-browser compatibility and responsive design."
+      },
+      "4": {
+        "title": "Blog Section Development",
+        "description": "Developed the \"Blog\" section, including structure, commenting system, SEO optimization, and newsletter subscription, to increase user engagement and attract new customers."
+      },
+      "5": {
+        "title": "Careers Section Update",
+        "description": "Updated the \"Careers\" section and developed a security monitoring interface, improving design, implementing application forms, as well as data visualization, filtering, and sorting tools."
+      }
+    }
+  },
+  "experience": {
+    "title": "Work Experience",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "companyWebsite": "Company Website",
+    "experiences": {
+      "1": {
+        "company": "Positive Technologies",
+        "position": "Frontend Developer",
+        "period": "April 2023 — March 2025",
+        "description": "Improved feedback forms with real-time validation. Developed the \"Blog\" section with commenting system integration and SEO optimization. Updated the \"Careers\" section. Developed the interface for an internal security monitoring system with data visualization and filtering.",
+        "shortDescription": "Form improvements, development of new sections, interface updates."
+      },
+      "2": {
+        "company": "Studio Nomad",
+        "position": "Frontend Developer",
+        "period": "March 2021 — April 2023",
+        "description": "Developed the logistics management platform interface (Trucking Desk) and company websites (San Remo, Hongqi) using React. Implemented dynamic data loading via REST API. Responsive design with Tailwind CSS. Integration of sliders with Swiper.js. Development of a universal component library.",
+        "shortDescription": "Interface development, responsive design, and component integration."
+      }
+    }
+  },
+  "contacts": {
+    "title": "Contact Me",
+    "question": "Do you want to ask something interesting?",
+    "availability": "Contact me. I am in touch mon-fri from 8 am to 8 pm (GMT).",
+    "emailCopied": "Email copied!",
+    "copyright": "© {{year}} Nikita Kuznetsov"
+  },
+  "debugMessages": {
+    "buttonClicked": "The 'Check it out!' button was clicked!",
+    "scrollingToSection": "Scrolling to section:",
+    "sectionNotFound": "Section not found, scrolling down to screen height"
+  }
+} 

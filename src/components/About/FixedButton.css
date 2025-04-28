@@ -1,0 +1,117 @@
+/* Стили для фиксированной кнопки */
+.fixed-button-container {
+  position: absolute !important;
+  bottom: 35% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 900 !important;
+  pointer-events: none !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Анимация появления кнопки */
+@keyframes buttonAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(-5px) scale(1.03);
+  }
+  70% {
+    transform: translateY(3px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.check-button {
+  background: none !important;
+  border: 2px solid #279c00 !important;
+  color: #279c00 !important;
+  font-size: 1.5rem !important;
+  cursor: pointer !important;
+  padding: 0.75rem 2rem !important;
+  border-radius: 6px !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+  outline: none !important;
+  box-shadow: 0 2px 10px rgba(39, 156, 0, 0.1) !important;
+  z-index: 900 !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  font-weight: 600 !important;
+  pointer-events: auto !important;
+  animation: pulse 2s infinite !important;
+  top: 210px
+}
+
+/* Когда кнопка видима, применяем анимацию появления */
+.check-button.fade-in {
+  animation: buttonAppear 0.8s ease-out forwards, pulse 2s 0.8s infinite !important;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 10px rgba(39, 156, 0, 0.1);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 2px 20px rgba(39, 156, 0, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 10px rgba(39, 156, 0, 0.1);
+  }
+}
+
+.check-button::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 0% !important;
+  height: 100% !important;
+  background: linear-gradient(45deg, #279c00, #4dff00) !important;
+  transition: width 0.4s ease !important;
+  z-index: -1 !important;
+  opacity: 0.9 !important;
+}
+
+.check-button:hover {
+  color: #ffffff !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 5px 15px rgba(39, 156, 0, 0.3) !important;
+  cursor: pointer !important;
+}
+
+.check-button:hover::before {
+  width: 100% !important;
+  left: 0 !important;
+}
+
+.check-button:active, 
+.check-button.clicked {
+  background-color: #1e7600 !important;
+  border-color: #1e7600 !important;
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 8px rgba(30, 118, 0, 0.3) !important;
+  transition: all 0.1s ease !important;
+}
+
+/* Скрываем кнопку, когда мобильное меню активно */
+body.mobile-menu-open .fixed-button-container {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease !important;
+} 

@@ -1,0 +1,434 @@
+.experience {
+  padding: 5rem 0;
+  background-color: var(--bg-secondary);
+  position: relative;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 60px;
+  color: var(--text-primary);
+  position: relative;
+  display: inline-block;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+  transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.section-title:hover::after {
+  width: 80%;
+}
+
+.experience-cards {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.experience-card {
+  background-color: var(--bg-primary);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 
+    8px 8px 16px rgba(0, 0, 0, 0.05),
+    -8px -8px 16px rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.experience-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    12px 12px 20px rgba(0, 0, 0, 0.1),
+    -12px -12px 20px rgba(255, 255, 255, 0.1);
+}
+
+.experience-card-header {
+  padding: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.01), rgba(0, 0, 0, 0.03));
+}
+
+.company-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: rgba(var(--accent-color-rgb), 0.05);
+  margin-right: 15px;
+  color: var(--accent-color);
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.company-icon::before {
+  content: '';
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.experience-card:hover .company-icon::before {
+  transform: translateX(100%);
+}
+
+.experience-card:hover .company-icon {
+  transform: scale(1.05) rotate(5deg);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.company-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 5px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Специальные стили для логотипа Studio Nomad */
+img[src*="nomad-logo"] {
+  background-color: #242424;
+  padding: 8px;
+}
+
+/* Специальные стили для логотипа Positive Technologies */
+img[src*="лого пт"] {
+  background-color: #ffffff;
+  padding: 10px;
+  border: 1px solid #e5e5e5;
+}
+
+/* Класс для логотипа Positive Technologies */
+.pt-logo {
+  background-color: #ffffff !important;
+  padding: 12px !important;
+  border: 1px solid #e5e5e5 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Дополнительные стили для класса nomad-logo */
+.nomad-logo {
+  background-color: #242424 !important;
+  padding: 10px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+.company-icon:hover .company-logo {
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.company-info {
+  flex: 1;
+}
+
+.company-name {
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+.company-name::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent-color);
+  transition: width 0.3s ease;
+}
+
+.experience-card:hover .company-name::after {
+  width: 100%;
+}
+
+.position-info, .period-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.info-icon {
+  color: var(--accent-color);
+  transition: transform 0.3s ease;
+}
+
+.experience-card:hover .position-icon {
+  transform: rotate(-10deg);
+}
+
+.experience-card:hover .period-icon {
+  transform: rotate(10deg);
+}
+
+.position {
+  font-size: 1.1rem;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.period {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.experience-card-body {
+  padding: 1.5rem;
+  position: relative;
+}
+
+.description {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+  height: 80px;
+  transition: height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.description.expanded {
+  height: auto;
+}
+
+.read-more-btn {
+  display: inline-block;
+  background: transparent;
+  border: none;
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.4rem 0.8rem;
+  border-radius: 30px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1;
+}
+
+.read-more-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.08), rgba(var(--accent-color-rgb), 0.15));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 30px;
+}
+
+.read-more-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.read-more-btn:hover::before {
+  opacity: 1;
+}
+
+.read-more-btn:hover::after {
+  width: 70%;
+}
+
+.read-more-btn:hover {
+  transform: translateY(-3px);
+  color: var(--accent-hover);
+  box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.15);
+}
+
+.read-more-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(var(--accent-color-rgb), 0.1);
+}
+
+.read-more-btn.expanded {
+  background-color: rgba(var(--accent-color-rgb), 0.08);
+}
+
+.experience-card-footer {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.project-links {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background-color: rgba(var(--accent-color-rgb), 0.1);
+  color: var(--accent-color);
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.project-link:hover {
+  background-color: var(--accent-color);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.link-icon {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.project-link:hover .link-icon {
+  transform: rotate(15deg);
+}
+
+.technologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.tech-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  background-color: rgba(var(--accent-color-rgb), 0.05);
+  color: var(--text-primary);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(var(--accent-color-rgb), 0.1);
+}
+
+.tech-tag:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  background-color: rgba(var(--accent-color-rgb), 0.1);
+}
+
+.tech-icon {
+  display: inline-flex;
+  color: var(--accent-color);
+  transition: transform 0.3s ease;
+}
+
+.tech-tag:hover .tech-icon {
+  transform: rotate(15deg) scale(1.2);
+}
+
+/* Медиа запросы для адаптивности */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 40px;
+  }
+  
+  .experience-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .company-icon {
+    width: 80px;
+    height: 80px;
+    font-size: 1.5rem;
+  }
+  
+  .company-name {
+    font-size: 1.5rem;
+  }
+  
+  .technologies {
+    gap: 0.5rem;
+  }
+  
+  .tech-tag {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .section-title {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+  }
+  
+  .experience-cards {
+    gap: 2rem;
+  }
+  
+  .company-icon {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .tech-tag, .project-link {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Темная тема */
+[data-theme="dark"] .experience-card {
+  box-shadow: 
+    8px 8px 16px rgba(0, 0, 0, 0.15),
+    -8px -8px 16px rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .experience-card:hover {
+  box-shadow: 
+    12px 12px 20px rgba(0, 0, 0, 0.2),
+    -12px -12px 20px rgba(255, 255, 255, 0.03);
+}
