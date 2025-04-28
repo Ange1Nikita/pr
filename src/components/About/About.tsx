@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import './About.css';
 import './BinaryBackground.css';
@@ -19,7 +19,6 @@ const INITIAL_DELAY = 500; // Задержка перед началом ани�
 function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisible: boolean) => void }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [bouncingIndex, setBouncingIndex] = useState<number | null>(null);
-  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const digitRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -30,7 +29,6 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
   const WAVE_STRENGTH = 80; // Увеличиваем силу отталкивания в 2 раза (было 40)
   const WAVE_FALLOFF = 1.3; // Уменьшаем для усиления эффекта (было 1.5)
   const MIN_DISTANCE = 12; // Немного уменьшаем для усиления близкого взаимодействия (было 15)
-  const MOMENTUM_FACTOR = 0.98; // Увеличиваем для дольшего сохранения импульса (было 0.97)
   const FRICTION_FACTOR = 0.99; // Уменьшаем трение для более дальних полетов (было 0.985)
   const PUSHABLE_BORDER = 5; // Процент от края экрана для перехода
   const TRANSITION_SMOOTHNESS = 0.1; // Уменьшаем для более плавного движения (было 0.2)
@@ -347,7 +345,6 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
       }
       
       prevMousePos.current = { x, y };
-      setMousePosition({ x, y });
     };
     
     // Добавляем слушатель события на document
@@ -766,10 +763,10 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
 
   const renderTextWithCursor = () => {
     const lines = displayText.split('\n');
-    return lines.map((line, i) => (
-      <span key={i} className="line">
+    return lines.map((line, lineIndex) => (
+      <span key={lineIndex} className="line">
         {line}
-        {i === lines.length - 1 && <span className="cursor" />}
+        {lineIndex === lines.length - 1 && <span className="cursor" />}
       </span>
     ));
   };

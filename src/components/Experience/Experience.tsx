@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import './Experience.css';
-import { useTheme } from '../../context/ThemeContext';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { FaBuilding, FaCalendarAlt, FaBriefcase, FaLink, FaCode, FaChevronDown, FaChevronUp } from 'react-icons/fa';
@@ -40,7 +39,7 @@ interface Experience {
 const experiences: Experience[] = [
   {
     id: 1,
-    logo: '/images/лого пт.png',
+    logo: './images/лого пт.png',
     technologies: ['React', 'TypeScript', 'Redux', 'REST API', 'Jest', 'Webpack', 'CSS/SCSS'],
     links: [
       { url: 'https://www.ptsecurity.com', label: '' } // Пустая метка, будет заполнена из i18n
@@ -48,7 +47,7 @@ const experiences: Experience[] = [
   },
   {
     id: 2,
-    logo: '/images/nomad-logo.png',
+    logo: './images/nomad-logo.png',
     technologies: ['React', 'TypeScript', 'REST API', 'Tailwind CSS', 'Swiper.js', 'Google Analytics', 'CSS/SCSS'],
     links: [
       { url: 'https://trucking-desk.com/ru', label: 'Trucking Desk' },
@@ -60,7 +59,6 @@ const experiences: Experience[] = [
 
 export const Experience: React.FC = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const sectionRef = useRef<HTMLElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [expandedCards, setExpandedCards] = useState<{[key: number]: boolean}>({});
