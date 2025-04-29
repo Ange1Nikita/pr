@@ -440,7 +440,7 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
   // Проверяем ширину экрана при загрузке и при ресайзе
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsSmallScreen(window.innerWidth <= 1024);
+      setIsSmallScreen(window.innerWidth < 1024);
     };
     
     // Проверяем при загрузке
@@ -727,11 +727,11 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
       </div>
       
       <div className="about-wrapper">
-        {/* Видео-фон для маленьких экранов - показывается всегда */}
+        {/* Видео-фон - показывается только на маленьких экранах (1024px и меньше) */}
         {isSmallScreen && (
           <video
             className="about-bg-video"
-            src="/0_Purple_Abstract_3840x2160.mp4"
+            src="/pr/video.mp4"
             autoPlay
             loop
             muted

@@ -8,6 +8,6 @@ export default defineConfig({
     port: 3000,
     open: true
   },
-  publicDir: 'public',
-  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg']
+  publicDir: 'public-temp',
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg', '**/*.mp4']
 }) 

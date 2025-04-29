@@ -23,31 +23,31 @@ export const Portfolio: React.FC = () => {
   const projects: ProjectCard[] = [
     {
       id: 1,
-      imageUrl: "./images/фото1.png",
+      imageUrl: "/pr/images/фото1.png",
       technologies: ["React", "TypeScript", "REST API", "Tailwind CSS", "Google Analytics", "Google Tag Manager"],
       projectUrl: "https://trucking-desk.com/ru"
     },
     {
       id: 2,
-      imageUrl: "./images/фото2.png",
+      imageUrl: "/pr/images/фото2.png",
       technologies: ["React", "Swiper.js", "HTML", "SCSS"],
       projectUrl: "https://san-remo.kz/"
     },
     {
       id: 3,
-      imageUrl: "./images/фото3.png",
+      imageUrl: "/pr/images/фото3.png",
       technologies: ["React", "jQuery", "Node.js", "MongoDB"],
       projectUrl: "https://hongqi-auto.kz/"
     },
     {
       id: 4,
-      imageUrl: "./images/фото4.png",
+      imageUrl: "/pr/images/фото4.png",
       technologies: ["React", "TypeScript", "REST API", "Firebase", "Tailwind", "SEO-оптимизация"],
       projectUrl: "https://habr.com/ru/companies/pt/articles/"
     },
     {
       id: 5,
-      imageUrl: "./images/фото5.png",
+      imageUrl: "/pr/images/фото5.png",
       technologies: ["React", "Express", "PostgreSQL"],
       projectUrl: "https://www.ptsecurity.com/ru-ru/about/vacancy/"
     }
