@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import * as RAPIER from '@dimforge/rapier2d';
 import './BinaryBackground.css';
 import { useTheme } from '../../context/ThemeContext';
+import { ThemeContext } from '../../context/ThemeContext';
+import { RAPIER as RAPIERCompat } from '@dimforge/rapier2d-compat';
 
 interface BinaryBackgroundRapierProps {
   onVisibilityChange: (isVisible: boolean) => void;
@@ -12,7 +14,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
   const [isVisible, setIsVisible] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [bouncingIndex, setBouncingIndex] = useState<number | null>(null);
-  const [blinkingIndices, setBlinkingIndices] = useState<Set<number>>(new Set());
   
   const containerRef = useRef<HTMLDivElement>(null);
   const digitRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -32,8 +33,8 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
   // Домашние позиции
   const digitHomePositions = useRef<{ x: number, y: number }[]>([]);
   
-  // Мерцание "звезд" - индивидуальные параметры для каждой цифры
-  const starBlinkParams = useRef<{ speed: number, offset: number, intensity: number }[]>([]);
+  // Фиксированные размеры для каждой цифры
+  const digitSizes = useRef<number[]>([]);
   
   // Коэффициенты физики
   const RETURN_DELAY = 2000; // Задержка перед возвратом в мс
@@ -45,10 +46,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
   const SPRING_EFFECT = 0.003; // Коэффициент пружинного эффекта
   const ROTATION_DAMPING = 0.97; // Затухание вращения
   const ROTATION_FACTOR = 0.5; // Сила вращения при ударе
-  const BLINK_INTERVAL_MIN = 5000; // Минимальное время между миганиями (мс) - увеличено
-  const BLINK_INTERVAL_MAX = 15000; // Максимальное время между миганиями (мс) - увеличено
-  const BLINK_DURATION = 3000; // Длительность одного мигания (мс) - увеличено
-  const MAX_BLINKING_DIGITS = 25; // Увеличиваем количество одновременно мигающих "звезд"
   
   // Создаем двоичные цифры
   const binaryDigits = React.useMemo(() => {
@@ -57,6 +54,11 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
   
   // Инициализация позиций элементов
   const positions = React.useMemo(() => {
+    // Предрассчитываем размеры для каждой цифры (один раз)
+    digitSizes.current = Array.from({ length: binaryDigits.length }, () => 
+      24 + Math.floor(Math.random() * 16)
+    );
+    
     // Предрассчитываем позиции цифр равномерно по экрану
     return binaryDigits.map(() => {
       const left = 5 + Math.random() * 90; // % от ширины экрана (5-95%)
@@ -68,88 +70,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
       };
     });
   }, [binaryDigits]);
-  
-  // Инициализируем параметры мерцания "звезд"
-  useEffect(() => {
-    // Задаем уникальные параметры мерцания для каждой цифры
-    starBlinkParams.current = binaryDigits.map(() => ({
-      // Скорость мерцания - разная для каждой "звезды"
-      speed: 0.0001 + Math.random() * 0.0003,
-      // Сдвиг фазы - чтобы все "звезды" мерцали не синхронно
-      offset: Math.random() * Math.PI * 2,
-      // Интенсивность мерцания - некоторые мигают сильнее, некоторые слабее
-      intensity: 0.3 + Math.random() * 0.7
-    }));
-  }, [binaryDigits]);
-  
-  // Эффект для случайного мигания цифр
-  useEffect(() => {
-    const blinkTimers: number[] = [];
-    
-    // Функция для запуска мигания случайной цифры
-    const startRandomBlink = () => {
-      if (!isVisible) return;
-      
-      // Если уже достигнуто максимальное количество мигающих цифр, пропускаем
-      if (blinkingIndices.size >= MAX_BLINKING_DIGITS) {
-        // Запланируем следующую попытку через некоторое время
-        const nextTryDelay = Math.random() * 1500 + 500; // Уменьшаем задержку для более частых попыток
-        blinkTimers.push(window.setTimeout(startRandomBlink, nextTryDelay));
-        return;
-      }
-      
-      // Выбираем случайную цифру, которая еще не мигает
-      let randomIndex;
-      let attempts = 0;
-      
-      do {
-        randomIndex = Math.floor(Math.random() * binaryDigits.length);
-        attempts++;
-        // Предотвращаем бесконечный цикл, если все цифры уже мигают
-        if (attempts > 20) break;
-      } while (blinkingIndices.has(randomIndex));
-      
-      // Если все попытки неудачны или нашли цифру, которая еще не мигает
-      if (attempts <= 20 && !blinkingIndices.has(randomIndex)) {
-        // Добавляем индекс в набор мигающих цифр
-        setBlinkingIndices(prev => {
-          const newSet = new Set(prev);
-          newSet.add(randomIndex);
-          return newSet;
-        });
-        
-        // Убираем мигание через определенное время
-        const blinkTimer = window.setTimeout(() => {
-          setBlinkingIndices(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(randomIndex);
-            return newSet;
-          });
-          
-          // Запускаем следующее мигание через случайный интервал
-          const nextBlinkDelay = Math.random() * (BLINK_INTERVAL_MAX - BLINK_INTERVAL_MIN) + BLINK_INTERVAL_MIN;
-          blinkTimers.push(window.setTimeout(startRandomBlink, nextBlinkDelay));
-        }, BLINK_DURATION + Math.random() * 5000); // Добавляем случайность в продолжительность
-        
-        blinkTimers.push(blinkTimer);
-      } else {
-        // Если не нашли подходящую цифру, попробуем позже
-        const retryDelay = Math.random() * 2000 + 1000;
-        blinkTimers.push(window.setTimeout(startRandomBlink, retryDelay));
-      }
-    };
-    
-    // Запускаем начальные мигания с разными интервалами
-    for (let i = 0; i < 10; i++) { // Увеличиваем количество начальных миганий
-      const initialDelay = Math.random() * 3000 + i * 800; 
-      blinkTimers.push(window.setTimeout(startRandomBlink, initialDelay));
-    }
-    
-    // Очистка таймеров при размонтировании
-    return () => {
-      blinkTimers.forEach(timer => window.clearTimeout(timer));
-    };
-  }, [binaryDigits.length, isVisible, blinkingIndices]);
   
   // Инициализация Rapier
   useEffect(() => {
@@ -229,23 +149,13 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
     let lastTime = 0;
     const isInitialized = () => !!worldRef.current && bodiesRef.current.length > 0;
     
-    // Прогрессивная анимация - появление цифр постепенно
+    // Прогрессивная анимация - появление цифр сразу
     binaryDigits.forEach((_, index) => {
-      setTimeout(() => {
-        if (digitRefs.current[index]) {
-          digitRefs.current[index]?.classList.add('visible');
-        }
-      }, index * 15); // Ускоряем появление цифр
+      if (digitRefs.current[index]) {
+        // Сразу делаем видимыми без анимации
+        digitRefs.current[index]!.style.opacity = '1';
+      }
     });
-    
-    // Проверяем видимость через 2 секунды
-    setTimeout(() => {
-      binaryDigits.forEach((_, index) => {
-        if (digitRefs.current[index] && !digitRefs.current[index]?.classList.contains('visible')) {
-          digitRefs.current[index]?.classList.add('visible');
-        }
-      });
-    }, 2000);
     
     const updatePhysics = (timestamp: number) => {
       // Проверяем, инициализирован ли физический мир
@@ -355,12 +265,23 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
           const offsetX = (position.x / SCALE_FACTOR) - homePos.x;
           const offsetY = (position.y / SCALE_FACTOR) - homePos.y;
           
-          // Применяем смещение и вращение через transform
-          digit.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${rotation}rad)`;
+          // Используем фиксированный размер для каждой цифры из preRef
+          const fontSize = digitSizes.current[index];
           
-          // Обновляем цвет в зависимости от темы и состояния
-          // Это позволяет одновременно реагировать на изменение темы и на активные состояния
-          updateDigitColor(digit, index);
+          // ВАЖНО: Устанавливаем стиль напрямую, без анимаций
+          digit.style.cssText = `
+            position: absolute;
+            left: ${positions[index].left};
+            top: ${positions[index].top};
+            font-size: ${fontSize}px;
+            color: ${activeIndex === index ? '#00ff00' : theme === 'dark' ? '#ffffff' : '#000000'};
+            opacity: 1;
+            transform: translate(${offsetX}px, ${offsetY}px) rotate(${rotation}rad);
+            cursor: pointer;
+            user-select: none;
+            font-family: monospace;
+            z-index: 10;
+          `;
         }
       });
       
@@ -383,11 +304,10 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
   const updateDigitColor = (digit: HTMLDivElement, index: number) => {
     const isActive = activeIndex === index;
     const isBouncing = bouncingIndex === index;
-    const isBlinking = blinkingIndices.has(index);
     
     // Базовый цвет в зависимости от темы
     let color = theme === 'dark' ? '#ffffff' : '#000000';
-    let opacity = 1; // Базовая непрозрачность
+    let opacity = 1; // Фиксированная непрозрачность
     let textShadow = theme === 'dark' 
       ? '0 0 3px rgba(255, 255, 255, 0.3)' 
       : '0 0 3px rgba(0, 0, 0, 0.2)';
@@ -396,53 +316,9 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
     if (isActive || isBouncing) {
       color = '#00ff00';
       textShadow = '0 0 8px rgba(0, 255, 0, 0.7)';
-    } 
-    // Эффект мерцания "звезд"
-    else if (isBlinking || Math.random() < 0.05) { // Увеличена вероятность спонтанного мерцания
-      // Получаем индивидуальные параметры мерцания для этой цифры
-      const { speed, offset, intensity } = starBlinkParams.current[index] || 
-        { speed: 0.0002, offset: 0, intensity: 0.5 };
-      
-      // Создаем сложную функцию мерцания для имитации реалистичных звезд
-      // Комбинируем несколько синусоид разной частоты
-      const time = Date.now();
-      const mainPulse = Math.sin(time * speed + offset);
-      const secondaryPulse = Math.sin(time * speed * 1.3 + offset * 0.7) * 0.3;
-      const tertiaryPulse = Math.sin(time * speed * 0.7 + offset * 1.5) * 0.2;
-      
-      // Комбинированный эффект мерцания
-      const combinedPulse = (mainPulse + secondaryPulse + tertiaryPulse) / 1.5;
-      // Нормализуем в диапазон от 0 до 1 и применяем интенсивность
-      const blinkValue = (combinedPulse * 0.5 + 0.5) * intensity;
-      
-      if (theme === 'dark') {
-        // В темной теме меняем яркость и добавляем свечение
-        opacity = 0.4 + blinkValue * 0.6; // От 40% до 100% яркости
-        
-        // Интенсивность свечения зависит от яркости
-        const glowIntensity = Math.min(1, blinkValue * 1.5);
-        const glowSize = Math.floor(3 + blinkValue * 12); // Размер свечения от 3px до 15px
-        const glowOpacity = 0.2 + blinkValue * 0.6; // Непрозрачность свечения
-        
-        textShadow = `0 0 ${glowSize}px rgba(255, 255, 255, ${glowOpacity})`;
-        
-        // Добавляем легкое цветовое смещение для самых ярких "звезд"
-        if (blinkValue > 0.85) {
-          color = `rgb(255, 255, ${Math.floor(240 + blinkValue * 15)})`; // Слегка голубоватый оттенок
-        }
-      } else {
-        // В светлой теме меняем контрастность
-        opacity = 0.5 + blinkValue * 0.5; // От 50% до 100% контрастности
-        
-        // Меньше заметное свечение для светлой темы
-        const glowSize = Math.floor(2 + blinkValue * 8);
-        const glowOpacity = 0.1 + blinkValue * 0.3;
-        
-        textShadow = `0 0 ${glowSize}px rgba(0, 0, 0, ${glowOpacity})`;
-      }
     }
     
-    // Применяем цвет, прозрачность и эффект свечения
+    // Применяем цвет и эффект свечения
     digit.style.color = color;
     digit.style.opacity = opacity.toString();
     digit.style.textShadow = textShadow;
@@ -594,51 +470,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
     setTimeout(() => setBouncingIndex(null), 1000);
   };
   
-  // Стили для цифр - базируемся на предрассчитанных позициях
-  const getStyle = (index: number) => {
-    // Определяем размер в зависимости от позиции для эффекта глубины
-    // Цифры ближе к краям будут меньше, создавая объемный эффект
-    const centerX = 50; // Центр по X (%)
-    const centerY = 50; // Центр по Y (%)
-    const posX = parseFloat(positions[index].left);
-    const posY = parseFloat(positions[index].top);
-    
-    // Расстояние от центра (0-1)
-    const distFromCenter = Math.sqrt(
-      Math.pow((posX - centerX) / 50, 2) + 
-      Math.pow((posY - centerY) / 50, 2)
-    );
-    
-    // Размер зависит от расстояния от центра (больше в центре)
-    const sizeVariation = 1 - (distFromCenter * 0.25); // Уменьшил коэффициент для меньшего влияния расстояния
-    const baseSize = 18 + Math.random() * 22; // Увеличенный размер: от 18px до 40px
-    const fontSize = baseSize * sizeVariation;
-    
-    // Базовый цвет в зависимости от темы
-    const color = theme === 'dark' ? '#ffffff' : '#000000';
-    const initialOpacity = 0.4 + Math.random() * 0.6; // Начальная непрозрачность варьируется
-    
-    return {
-      position: 'absolute' as const,
-      left: positions[index].left,
-      top: positions[index].top,
-      fontSize: `${fontSize}px`,
-      color: color,
-      opacity: initialOpacity,
-      transition: 'opacity 4s ease, color 4s ease, text-shadow 4s ease', // Очень плавные переходы
-      cursor: 'pointer',
-      userSelect: 'none' as const,
-      fontFamily: 'monospace',
-      fontWeight: Math.random() > 0.6 ? 'bold' : 'normal',
-      textShadow: theme === 'dark' ? 
-        '0 0 3px rgba(255, 255, 255, 0.3)' : 
-        '0 0 3px rgba(0, 0, 0, 0.2)',
-      willChange: 'transform, opacity, color, text-shadow', // Оптимизация для GPU
-      zIndex: 10,
-      mixBlendMode: theme === 'dark' ? 'screen' as const : 'multiply' as const, // Улучшаем смешивание с фоном
-    };
-  };
-  
   return (
     <div 
       className={`binary-background ${isVisible ? '' : 'hidden'}`}
@@ -651,16 +482,28 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
         height: '100vh',
         zIndex: 5,
         pointerEvents: isVisible ? 'auto' : 'none',
-        willChange: 'transform, opacity',
+        willChange: 'opacity',
         transform: 'translateZ(0)' // Включаем аппаратное ускорение
       }}
     >
       {binaryDigits.map((digit, index) => (
         <div
           key={index}
-          className={`binary-digit ${bouncingIndex === index ? 'bouncing' : ''}`}
           ref={el => digitRefs.current[index] = el}
-          style={getStyle(index)}
+          style={{
+            position: 'absolute',
+            left: positions[index].left,
+            top: positions[index].top,
+            fontSize: `${digitSizes.current[index]}px`, // Используем предопределенный фиксированный размер
+            color: theme === 'dark' ? '#ffffff' : '#000000',
+            opacity: 1,
+            cursor: 'pointer',
+            userSelect: 'none',
+            fontFamily: 'monospace',
+            fontWeight: Math.random() > 0.6 ? 'bold' : 'normal',
+            zIndex: 10,
+            // ВАЖНО: Никаких transition или animation!
+          }}
           onMouseEnter={() => handleMouseEnter(index)}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleClick(index)}

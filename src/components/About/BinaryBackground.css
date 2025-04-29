@@ -9,12 +9,11 @@
   overflow: hidden;
   z-index: 5;
   pointer-events: none !important;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
   transform: translateZ(0); /* Аппаратное ускорение */
   backface-visibility: hidden; /* Для гладкости */
   perspective: 1000px; /* Для гладкости */
   contain: layout paint size; /* Оптимизация */
-  will-change: opacity, visibility, transform;
+  will-change: transform; /* Удаляем opacity, visibility */
 }
 
 .binary-background {
@@ -29,7 +28,6 @@
   overflow: hidden;
   cursor: none;
   pointer-events: none !important;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
   transform: translateZ(0); /* Аппаратное ускорение */
   backface-visibility: hidden; /* Для гладкости */
   perspective: 1000px; /* Для гладкости */
@@ -39,7 +37,6 @@
   opacity: 0 !important;
   pointer-events: none !important;
   visibility: hidden !important;
-  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
   display: none !important;
 }
 
@@ -58,14 +55,11 @@
   user-select: none;
   pointer-events: all;
   font-family: 'Roboto Mono', monospace;
-  font-size: 2.5rem;
   font-weight: 700;
   line-height: 1;
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.15s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+  opacity: 1; /* Сразу видимые */
   z-index: 5;
-  will-change: transform, opacity;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  /* Удалены все transition и will-change */
 }
 
 /* Цвет бинарных цифр для светлой темы */
@@ -74,22 +68,18 @@
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
-.binary-digit.visible {
-  opacity: 1 !important;
-}
-
+/* Удаляем все hover/active состояния с анимациями */
 .binary-digit:hover {
   color: rgba(0, 255, 0, 1) !important;
   cursor: pointer;
-  transform: scale(1.5);
-  text-shadow: 0 0 8px rgba(0, 255, 0, 0.8) !important;
+  /* Никаких изменений размера или форматирования */
 }
 
+/* Упрощаем класс bouncing */
 .binary-digit.bouncing {
-  animation: bounce 1s ease-in-out;
   color: #00ff00 !important;
   z-index: 10;
-  text-shadow: 0 0 15px rgba(0, 255, 0, 0.9) !important;
+  /* Никаких изменений размера или анимаций */
 }
 
 .custom-cursor {
@@ -102,28 +92,6 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 100;
-  transition: opacity 0.3s ease;
   opacity: 0;
-  will-change: transform, opacity;
-}
-
-/* Анимация для светлой и темной темы */
-@keyframes bounce {
-  0% {
-    transform: scale(1);
-    color: rgba(0, 255, 0, 0.7) !important;
-  }
-  50% {
-    transform: scale(3);
-    color: rgb(0, 255, 255) !important;
-    text-shadow: 0 0 20px rgba(0, 255, 255, 0.9) !important;
-  }
-  75% {
-    color: rgb(255, 255, 0) !important;
-    text-shadow: 0 0 20px rgba(255, 255, 0, 0.9) !important;
-  }
-  100% {
-    transform: scale(1);
-    color: rgba(0, 255, 0, 0.7) !important;
-  }
+  will-change: transform; /* Только transform */
 } 

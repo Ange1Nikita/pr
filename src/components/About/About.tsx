@@ -21,6 +21,7 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [bouncingIndex, setBouncingIndex] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(true);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const containerRef = useRef<HTMLDivElement>(null);
   const digitRefs = useRef<(HTMLDivElement | null)[]>([]);
   const animationFrameRef = useRef<number | null>(null);
@@ -97,22 +98,15 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
   useEffect(() => {
     // Прогрессивная анимация - появление цифр постепенно
     binaryDigits.forEach((_, index) => {
-      setTimeout(() => {
-        if (digitRefs.current[index]) {
-          digitRefs.current[index]?.classList.add('visible');
-        }
-      }, index * 15); // Ускоряем появление цифр
+      // Устанавливаем все цифры сразу видимыми без setTimeout
+      if (digitRefs.current[index]) {
+        // Вместо добавления класса напрямую устанавливаем opacity
+        digitRefs.current[index]!.style.opacity = '1';
+        // Убедимся, что transform не меняется непредсказуемо
+        digitRefs.current[index]!.style.transform = 'none';
+      }
     });
     
-    // Проверяем видимость через 2 секунды
-    setTimeout(() => {
-      binaryDigits.forEach((_, index) => {
-        if (digitRefs.current[index] && !digitRefs.current[index]?.classList.contains('visible')) {
-          digitRefs.current[index]?.classList.add('visible');
-        }
-      });
-    }, 2000);
-
     // Запускаем анимацию движения с плавностью и инерцией
     const applyMomentum = (timestamp: number) => {
       if (!isVisible) {
@@ -362,10 +356,11 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
               digitMomentum.current[index].x += pushX;
               digitMomentum.current[index].y += pushY;
               
-              // Добавляем подсветку для близких цифр
+              // Добавляем подсветку для близких цифр БЕЗ изменения размера
               if (distance < 80) {
                 digit.style.color = '#00ff00';
-                digit.style.transform = `translate(${digitPositions.current[index].x}px, ${digitPositions.current[index].y}px) scale(1.2)`;
+                // Удаляем scale, чтобы избежать мигания размера
+                digit.style.transform = `translate(${digitPositions.current[index].x}px, ${digitPositions.current[index].y}px)`;
               }
             }
           });
@@ -414,10 +409,7 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
   
   const handleClick = (index: number) => {
     setBouncingIndex(index);
-    
-    setTimeout(() => {
-      setBouncingIndex(null);
-    }, 1000);
+    setTimeout(() => setBouncingIndex(null), 1000);
   };
   
   const getStyle = (index: number, position: { left: string, top: string }) => {
@@ -425,16 +417,24 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
       position: 'absolute',
       left: position.left,
       top: position.top,
-      opacity: 0,
-      transition: 'opacity 0.5s ease', // Ускоряем анимацию перемещения
+      opacity: 1, // Начинаем сразу с видимых цифр
+      fontSize: `${Math.floor(24 + Math.random() * 16)}px`, // Фиксированный размер
+      transition: 'color 0.5s ease', // Только для цвета, БЕЗ transition для transform и opacity
+      fontFamily: 'monospace',
+      fontWeight: Math.random() > 0.6 ? 'bold' : 'normal',
+      color: theme === 'dark' ? '#ffffff' : '#000000',
+      userSelect: 'none' as const,
+      cursor: 'pointer',
+      // Убираем willChange для transform чтобы избежать оптимизаций браузера,
+      // которые могут вызвать непредсказуемое поведение
+      willChange: 'color',
     };
     
-    // Добавляем базовые стили для активного состояния
+    // Добавляем базовые стили для активного состояния (только цвет)
     if (activeIndex === index) {
       return { 
         ...baseStyle,
-        color: '#00ff00', 
-        fontSize: '2.8em',
+        color: '#00ff00',
       };
     }
     
@@ -460,6 +460,34 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
     onVisibilityChange(isVisible);
   }, [isVisible, onVisibilityChange]);
 
+  // Отслеживаем текущую тему
+  useEffect(() => {
+    // Получаем текущую тему из data-theme атрибута
+    const getCurrentTheme = () => {
+      return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    };
+    
+    // Устанавливаем начальную тему
+    setTheme(getCurrentTheme());
+    
+    // Создаем observer для отслеживания изменений атрибута data-theme
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+          setTheme(getCurrentTheme());
+        }
+      });
+    });
+    
+    // Начинаем отслеживать изменения атрибута data-theme
+    observer.observe(document.documentElement, { attributes: true });
+    
+    // Очищаем observer при размонтировании
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <div 
       className={`binary-background ${isVisible ? '' : 'hidden'}`}
@@ -472,14 +500,14 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
         height: '100vh',
         zIndex: 5,
         pointerEvents: isVisible ? 'auto' : 'none',
-        willChange: 'transform, opacity',
+        willChange: 'opacity', // Удаляем transform из willChange
         transform: 'translateZ(0)' // Включаем аппаратное ускорение
       }}
     >
       {binaryDigits.map((digit, index) => (
         <div
           key={index}
-          className={`binary-digit ${bouncingIndex === index ? 'bouncing' : ''}`}
+          className="binary-digit" // Удаляем класс bounce
           ref={el => digitRefs.current[index] = el}
           style={getStyle(index, positions[index])}
           onMouseEnter={() => handleMouseEnter(index)}
@@ -754,7 +782,7 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
 
   return (
     <div className="about-container">
-      {/* Бинарный фон фиксированный на первом экране */}
+      {/* Бинарный фон с использованием ТОЛЬКО BinaryBackgroundRapier */}
       <div 
         style={{
           position: 'fixed',
