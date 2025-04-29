@@ -155,14 +155,13 @@
   min-height: auto;
   margin-bottom: 2rem;
   position: relative;
-  opacity: 0;
+  opacity: 1;
   text-shadow: none;
   white-space: pre-line;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.5s ease-out 5.3s forwards;
 }
 
 .typing-text span.line {

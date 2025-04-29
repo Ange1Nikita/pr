@@ -4,16 +4,17 @@ import { useTranslation } from 'react-i18next';
 import './About.css';
 import './BinaryBackground.css';
 import './FixedButton.css';
+import BinaryBackgroundRapier from './BinaryBackgroundRapier';
 
 const TYPING_SPEED = 100;
 const ERASING_SPEED = 100;
 const PAUSE_DURATION = 1000;
 // Общая длительность падения шара
-const BOUNCE_DURATION = 3300; // 3.3 секунды
+// const BOUNCE_DURATION = 3300; // 3.3 секунды
 // Момент начала морфинга (за 0.2 секунды до конца анимации)
 // const MORPH_START_TIME = BOUNCE_DURATION - 200;
 // const MORPH_DURATION = 2000; // Длительность анимации морфинга
-const INITIAL_DELAY = 500; // Задержка перед началом анимации текста после морфинга
+// const INITIAL_DELAY = 0; // Убираем начальную задержку
 
 // Супер простой компонент
 function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisible: boolean) => void }) {
@@ -497,10 +498,13 @@ interface AboutProps {
 
 export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
   const { t } = useTranslation();
+  // Начинаем с пустого текста
   const [displayText, setDisplayText] = useState('');
   const [showButton, setShowButton] = useState(false);
-  const [startTyping, setStartTyping] = useState(false);
-  const morphBackgroundRef = useRef<HTMLDivElement>(null);
+  // Инициализируем startTyping как true, чтобы анимация начиналась сразу
+  const [startTyping, setStartTyping] = useState(true);
+  // Удаляем неиспользуемые ссылки
+  // const morphBackgroundRef = useRef<HTMLDivElement>(null);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; size: number; color: string; velocityX: number; velocityY: number }>>([]);
   const particleContainerRef = useRef<HTMLDivElement>(null);
   // Новый стейт для видимости бинарного поля
@@ -626,52 +630,16 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
     }, 1000);
   };
 
-  // При монтировании компонента - устанавливаем начальную позицию шара
+  // Вместо морфинга сразу запускаем анимацию текста и вызываем onAnimationComplete
   useEffect(() => {
-    const morphBackground = morphBackgroundRef.current;
-    if (!morphBackground) return;
-
-    // Устанавливаем начальную позицию - левый верхний угол
-    morphBackground.style.position = 'fixed';
-    morphBackground.style.top = '0';
-    morphBackground.style.left = '0';
-    morphBackground.style.margin = '0';
-    morphBackground.style.padding = '0';
-  }, []);
-
-  // Запускаем морфинг немного раньше окончания анимации падения
-  /*
-  useEffect(() => {
-    const morphBackground = morphBackgroundRef.current;
-    if (!morphBackground) return;
-
-    const startMorphing = () => {
-      morphBackground.classList.add('morphing');
-      
-      // Запускаем анимацию текста после завершения морфинга
-      setTimeout(() => {
-        setStartTyping(true);
-        onAnimationComplete?.();
-      }, MORPH_DURATION + INITIAL_DELAY);
-    };
-
-    // Запускаем морфинг немного раньше завершения анимации падения
-    setTimeout(startMorphing, MORPH_START_TIME);
-  }, [onAnimationComplete]);
-  */
-  
-  // Вместо морфинга сразу запускаем анимацию текста
-  useEffect(() => {
-    setTimeout(() => {
-      setStartTyping(true);
-      onAnimationComplete?.();
-    }, INITIAL_DELAY);
+    // Немедленный вызов без задержки
+    onAnimationComplete?.();
+    // startTyping уже установлен в true, поэтому анимация начнется сразу
   }, [onAnimationComplete]);
 
-  // Анимация текста
+  // Анимация текста - запускается немедленно при монтировании компонента
   useEffect(() => {
-    if (!startTyping) return;
-
+    // Сразу запускаем анимацию печати без задержки
     let timeoutId: number;
     let phase: 'typing0' | 'typing1' | 'erasing' | 'typing2' = 'typing0';
     let currentIndex = 0;
@@ -682,7 +650,7 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
 
     const animate = () => {
       if (phase === 'typing0') {
-        // Печатаем базовый текст
+        // Печатаем базовый текст побуквенно
         if (currentIndex <= baseText.length) {
           setDisplayText(baseText.slice(0, currentIndex));
           currentIndex++;
@@ -723,18 +691,17 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
           currentIndex++;
           timeoutId = window.setTimeout(animate, TYPING_SPEED);
         } else {
-          // Показываем кнопку только после полного завершения анимации текста
-          setTimeout(() => {
-            setShowButton(true);
-          }, 500); // Небольшая задержка перед показом кнопки
+          // Показываем кнопку сразу после завершения печати
+          setShowButton(true);
         }
       }
     };
 
-    timeoutId = window.setTimeout(animate, 0);
+    // Запускаем анимацию немедленно без задержки
+    animate();
 
     return () => window.clearTimeout(timeoutId);
-  }, [startTyping, t]);
+  }, [t]); // Убираем startTyping из зависимостей, анимация начинается сразу
 
   const renderTextWithCursor = () => {
     const lines = displayText.split('\n');
@@ -804,7 +771,7 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
           willChange: 'opacity, visibility'
         }}
       >
-        <BinaryBackground onVisibilityChange={() => {}} />
+        <BinaryBackgroundRapier onVisibilityChange={setIsBinaryVisible} />
       </div>
       
       <div className="about-wrapper">
@@ -829,6 +796,7 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
             }}
           />
         )}
+        {/* Удаляем неиспользуемый элемент морфинга */}
         {/* <div className="morph-background" ref={morphBackgroundRef} /> */}
         <div className="content-container">
           <section id="about" className="about">

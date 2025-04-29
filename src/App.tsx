@@ -11,12 +11,16 @@ import { Contacts } from './components/Contacts';
 import { ThemeProvider } from './context/ThemeContext';
 import './styles/global.css';
 
-const INITIAL_ANIMATION_DURATION = 3000; // 3 секунды для начальной анимации
+// Удаляем задержку, чтобы сразу отображать контент
+// const INITIAL_ANIMATION_DURATION = 3000; // 3 секунды для начальной анимации
 
 const App: React.FC = () => {
   const { i18n } = useTranslation();
-  const [showHeader, setShowHeader] = useState(false);
+  // Устанавливаем showHeader в true сразу
+  const [showHeader, setShowHeader] = useState(true);
 
+  // Удаляем эффект с задержкой, который откладывал показ header
+  /*
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowHeader(true);
@@ -24,6 +28,7 @@ const App: React.FC = () => {
 
     return () => clearTimeout(timer);
   }, []);
+  */
 
   // Проверяем сохраненный язык и применяем его
   useEffect(() => {
@@ -39,7 +44,7 @@ const App: React.FC = () => {
         <div className="app">
           {showHeader && <Header />}
           <main>
-            <About onAnimationComplete={() => setShowHeader(true)} />
+            <About onAnimationComplete={() => {}} />
             <Skills />
             <Portfolio />
             <Experience />
