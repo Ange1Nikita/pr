@@ -11,8 +11,8 @@ const PAUSE_DURATION = 1000;
 // Общая длительность падения шара
 const BOUNCE_DURATION = 3300; // 3.3 секунды
 // Момент начала морфинга (за 0.2 секунды до конца анимации)
-const MORPH_START_TIME = BOUNCE_DURATION - 200;
-const MORPH_DURATION = 2000; // Длительность анимации морфинга
+// const MORPH_START_TIME = BOUNCE_DURATION - 200;
+// const MORPH_DURATION = 2000; // Длительность анимации морфинга
 const INITIAL_DELAY = 500; // Задержка перед началом анимации текста после морфинга
 
 // Супер простой компонент
@@ -640,6 +640,7 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
   }, []);
 
   // Запускаем морфинг немного раньше окончания анимации падения
+  /*
   useEffect(() => {
     const morphBackground = morphBackgroundRef.current;
     if (!morphBackground) return;
@@ -656,6 +657,15 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
 
     // Запускаем морфинг немного раньше завершения анимации падения
     setTimeout(startMorphing, MORPH_START_TIME);
+  }, [onAnimationComplete]);
+  */
+  
+  // Вместо морфинга сразу запускаем анимацию текста
+  useEffect(() => {
+    setTimeout(() => {
+      setStartTyping(true);
+      onAnimationComplete?.();
+    }, INITIAL_DELAY);
   }, [onAnimationComplete]);
 
   // Анимация текста
@@ -819,7 +829,7 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
             }}
           />
         )}
-        <div className="morph-background" ref={morphBackgroundRef} />
+        {/* <div className="morph-background" ref={morphBackgroundRef} /> */}
         <div className="content-container">
           <section id="about" className="about">
             <div className="about-content">
