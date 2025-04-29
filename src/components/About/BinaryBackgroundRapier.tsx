@@ -1,9 +1,7 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import * as RAPIER from '@dimforge/rapier2d';
 import './BinaryBackground.css';
 import { useTheme } from '../../context/ThemeContext';
-import { ThemeContext } from '../../context/ThemeContext';
-import { RAPIER as RAPIERCompat } from '@dimforge/rapier2d-compat';
 
 interface BinaryBackgroundRapierProps {
   onVisibilityChange: (isVisible: boolean) => void;

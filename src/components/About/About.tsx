@@ -19,7 +19,6 @@ const PAUSE_DURATION = 1000;
 // Супер простой компонент
 function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisible: boolean) => void }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [bouncingIndex, setBouncingIndex] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -408,8 +407,7 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
   };
   
   const handleClick = (index: number) => {
-    setBouncingIndex(index);
-    setTimeout(() => setBouncingIndex(null), 1000);
+    setActiveIndex(null);
   };
   
   const getStyle = (index: number, position: { left: string, top: string }) => {
@@ -530,7 +528,7 @@ export const About: React.FC<AboutProps> = ({ onAnimationComplete }) => {
   const [displayText, setDisplayText] = useState('');
   const [showButton, setShowButton] = useState(false);
   // Инициализируем startTyping как true, чтобы анимация начиналась сразу
-  const [startTyping, setStartTyping] = useState(true);
+  const [, ] = useState(true);
   // Удаляем неиспользуемые ссылки
   // const morphBackgroundRef = useRef<HTMLDivElement>(null);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; size: number; color: string; velocityX: number; velocityY: number }>>([]);

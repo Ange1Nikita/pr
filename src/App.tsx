@@ -17,7 +17,7 @@ import './styles/global.css';
 const App: React.FC = () => {
   const { i18n } = useTranslation();
   // Устанавливаем showHeader в true сразу
-  const [showHeader, setShowHeader] = useState(true);
+  const [showHeader] = useState(true);
 
   // Удаляем эффект с задержкой, который откладывал показ header
   /*
