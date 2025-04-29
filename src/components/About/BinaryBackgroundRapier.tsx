@@ -39,8 +39,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
   const SCALE_FACTOR = 0.01; // Коэффициент для преобразования пикселей в метры
   const FRICTION_FACTOR = 0.99; // Трение для плавного затухания движения
   const HOME_THRESHOLD = 0.15; // Порог для определения "дома"
-  const HOME_SMOOTHING = 0.02; // Плавность возврата
-  const PUSHABLE_BORDER = 5; // Процент от края экрана для перехода
   const SPRING_EFFECT = 0.003; // Коэффициент пружинного эффекта
   const ROTATION_DAMPING = 0.97; // Затухание вращения
   const ROTATION_FACTOR = 0.5; // Сила вращения при ударе
@@ -165,7 +163,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
       const world = worldRef.current!;
       
       // Рассчитываем дельту времени
-      const deltaTime = lastTime ? (timestamp - lastTime) / 1000 : 0.016;
       lastTime = timestamp;
       
       // Проверяем, нужно ли возвращать цифры на исходное место
@@ -297,30 +294,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
       }
     };
   }, [isVisible, binaryDigits, theme]);
-  
-  // Обновление цвета цифры в зависимости от темы и состояния
-  const updateDigitColor = (digit: HTMLDivElement, index: number) => {
-    const isActive = activeIndex === index;
-    const isBouncing = bouncingIndex === index;
-    
-    // Базовый цвет в зависимости от темы
-    let color = theme === 'dark' ? '#ffffff' : '#000000';
-    let opacity = 1; // Фиксированная непрозрачность
-    let textShadow = theme === 'dark' 
-      ? '0 0 3px rgba(255, 255, 255, 0.3)' 
-      : '0 0 3px rgba(0, 0, 0, 0.2)';
-    
-    // Если цифра активна, делаем ее зеленой
-    if (isActive || isBouncing) {
-      color = '#00ff00';
-      textShadow = '0 0 8px rgba(0, 255, 0, 0.7)';
-    }
-    
-    // Применяем цвет и эффект свечения
-    digit.style.color = color;
-    digit.style.opacity = opacity.toString();
-    digit.style.textShadow = textShadow;
-  };
   
   // Обработчик движения мыши
   useEffect(() => {
