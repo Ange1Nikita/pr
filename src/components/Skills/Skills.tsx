@@ -32,7 +32,7 @@ interface SoftSkill {
 }
 
 export const Skills: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<'hard' | 'soft'>('hard');
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
   const skillsRef = useRef<HTMLDivElement>(null);
@@ -106,6 +106,63 @@ export const Skills: React.FC = () => {
     { key: 'learning', icon: <MdBook /> }
   ];
 
+  // Функция для обновления индикаторов прогресса
+  const refreshProgressBars = () => {
+    // Получаем все индикаторы прогресса
+    const progressBars = Object.values(progressRefs.current).filter(ref => ref);
+    
+    // Сбрасываем ширину индикаторов
+    progressBars.forEach(bar => {
+      if (bar) {
+        bar.style.width = '0';
+      }
+    });
+    
+    // Запускаем анимацию заново после небольшой задержки
+    setTimeout(() => {
+      progressBars.forEach(bar => {
+        if (bar) {
+          const levelAttr = bar.getAttribute('data-level') || '5';
+          const level = parseInt(levelAttr, 10);
+          bar.style.width = `${level * 10}%`;
+        }
+      });
+    }, 100);
+  };
+
+  // Эффект для отслеживания изменения языка
+  useEffect(() => {
+    if (activeTab === 'hard') {
+      refreshProgressBars();
+    } else if (activeTab === 'soft') {
+      // Обновляем анимацию карточек soft skills при смене языка
+      if (softSkillsRef.current) {
+        const cards = softSkillsRef.current.querySelectorAll('.soft-skill-card');
+        
+        // Сначала сбрасываем стили карточек
+        cards.forEach(card => {
+          (card as HTMLElement).style.opacity = '0';
+          (card as HTMLElement).style.transform = 'scale(0.9)';
+        });
+        
+        // Запускаем анимацию с небольшой задержкой
+        setTimeout(() => {
+          gsap.fromTo(
+            cards,
+            { opacity: 0, scale: 0.9 },
+            { 
+              opacity: 1, 
+              scale: 1, 
+              stagger: 0.1, 
+              duration: 0.5,
+              ease: 'back.out(1.4)'
+            }
+          );
+        }, 100);
+      }
+    }
+  }, [i18n.language, activeTab]);
+
   // Эффект для анимации появления и прогресс-баров
   useEffect(() => {
     if (!skillsRef.current) return;
@@ -175,7 +232,7 @@ export const Skills: React.FC = () => {
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
-  }, [activeTab]);
+  }, [activeTab, i18n.language]);
 
   // Добавляем эффект 3D наклона карточек
   useEffect(() => {

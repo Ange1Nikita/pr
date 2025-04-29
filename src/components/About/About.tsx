@@ -308,7 +308,7 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
   // Регистрируем глобальное отслеживание движения мыши
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
+      if (!containerRef.current || !isVisible) return;
       
       const rect = containerRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -322,6 +322,53 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
         // Сглаживаем скорость мыши (exponential moving average)
         mouseSpeed.current.x = mouseSpeed.current.x * 0.6 + deltaX * 0.4; // Меньше сглаживания (было 0.7/0.3)
         mouseSpeed.current.y = mouseSpeed.current.y * 0.6 + deltaY * 0.4; // Для более резкого отклика
+        
+        // Обновляем время последнего взаимодействия
+        lastInteractionTime.current = performance.now();
+        // Сбрасываем флаг возврата домой
+        isReturningHome.current = false;
+        
+        // Применяем отталкивание к ближайшим цифрам
+        const speed = Math.sqrt(mouseSpeed.current.x * mouseSpeed.current.x + mouseSpeed.current.y * mouseSpeed.current.y);
+        
+        if (speed > 3) { // Снижаем порог скорости для более частого срабатывания
+          digitRefs.current.forEach((digit, index) => {
+            if (!digit) return;
+            
+            // Получаем позицию цифры
+            const digitRect = digit.getBoundingClientRect();
+            const digitX = digitRect.left + digitRect.width / 2;
+            const digitY = digitRect.top + digitRect.height / 2;
+            
+            // Вычисляем расстояние от курсора до цифры
+            const distX = digitX - e.clientX;
+            const distY = digitY - e.clientY;
+            const distance = Math.sqrt(distX * distX + distY * distY);
+            
+            // Применяем отталкивание к цифрам в радиусе 150px от курсора
+            if (distance < 150) {
+              // Рассчитываем угол отталкивания
+              const angle = Math.atan2(distY, distX);
+              
+              // Сила отталкивания обратно пропорциональна расстоянию
+              const force = Math.min(25, 500 / (distance + 10)) * (speed / 5);
+              
+              // Рассчитываем вектор отталкивания
+              const pushX = Math.cos(angle) * force;
+              const pushY = Math.sin(angle) * force;
+              
+              // Применяем импульс к цифре
+              digitMomentum.current[index].x += pushX;
+              digitMomentum.current[index].y += pushY;
+              
+              // Добавляем подсветку для близких цифр
+              if (distance < 80) {
+                digit.style.color = '#00ff00';
+                digit.style.transform = `translate(${digitPositions.current[index].x}px, ${digitPositions.current[index].y}px) scale(1.2)`;
+              }
+            }
+          });
+        }
       }
       
       prevMousePos.current = { x, y };
@@ -334,8 +381,32 @@ function BinaryBackground({ onVisibilityChange }: { onVisibilityChange: (isVisib
     return () => {
       document.removeEventListener('mousemove', handleGlobalMouseMove);
     };
-  }, []);
+  }, [isVisible]);
   
+  // Добавляем animateFrame для постоянного обновления позиций цифр
+  useEffect(() => {
+    if (!isVisible || !containerRef.current) return;
+    
+    const updateDigitPositions = () => {
+      digitRefs.current.forEach((digit, index) => {
+        if (!digit) return;
+        
+        // Применяем текущие смещения
+        digit.style.transform = `translate(${digitPositions.current[index].x}px, ${digitPositions.current[index].y}px)`;
+      });
+      
+      animationFrameRef.current = requestAnimationFrame(updateDigitPositions);
+    };
+    
+    animationFrameRef.current = requestAnimationFrame(updateDigitPositions);
+    
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isVisible]);
+
   const handleMouseEnter = (index: number) => {
     setActiveIndex(index);
   };
