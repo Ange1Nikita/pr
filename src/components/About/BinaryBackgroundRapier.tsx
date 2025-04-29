@@ -11,7 +11,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
   const { theme } = useTheme(); // Получаем текущую тему
   const [isVisible, setIsVisible] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [bouncingIndex, setBouncingIndex] = useState<number | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const digitRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -142,7 +141,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
   
   // Функция обновления физики и отрисовки
   useEffect(() => {
-    let lastTime = 0;
     const isInitialized = () => !!worldRef.current && bodiesRef.current.length > 0;
     
     // Прогрессивная анимация - появление цифр сразу
@@ -161,9 +159,6 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
       }
       
       const world = worldRef.current!;
-      
-      // Рассчитываем дельту времени
-      lastTime = timestamp;
       
       // Проверяем, нужно ли возвращать цифры на исходное место
       const timeSinceLastInteraction = timestamp - lastInteractionTime.current;
@@ -437,8 +432,8 @@ function BinaryBackgroundRapier({ onVisibilityChange }: BinaryBackgroundRapierPr
   };
   
   const handleClick = (index: number) => {
-    setBouncingIndex(index);
-    setTimeout(() => setBouncingIndex(null), 1000);
+    setActiveIndex(index);
+    setTimeout(() => setActiveIndex(null), 1000);
   };
   
   return (
